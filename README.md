@@ -16,10 +16,6 @@
     the tables persisted by Part 1
   - `b2_churn_window_check.sql` — reproduces the figures behind the B2 churn
     window limitation (reads the tables persisted by Part 1)
-  - `b2_alternative_base_churn.sql` — optional: customer-base churn, an
-    alternative to the case's churn definition
-  - `dataset_drift_log.sql` — logs, at each run, how much the public dataset
-    moved (see the reproducibility note)
 - `/analysis/thelook_mbr_sep2026.pdf` — slides with the three visuals
 - `/README.md` — this file
 
@@ -56,8 +52,6 @@ The public dataset is regenerated regularly, including rows dated in the past
 2026 revenue was $113.3k, then $123.2k, then $117.5k, and its MoM growth went
 from +13.8% to +5.0%. All figures in this README and in the deck come from one
 frozen run (2026-10-26 04:19 UTC, `as_of_date` = 2026-10-26, UTC).
-`sql/additional_analysis/dataset_drift_log.sql` logs, at each run, when the source tables were
-last rewritten and a few fixed-period metrics, to show how much the data moved.
 
 ## Assumptions and date ranges
 
@@ -235,8 +229,7 @@ churned customers and churn rate per month, also split by new vs returning. Righ
   | More than 2 years | 807 | 24.4% | 100.0% |
 - **A 3-month reporting lag.** A month's churn is only known 90 days later. A
   customer-base view (customers crossing the inactivity threshold during the
-  month, `sql/additional_analysis/b2_alternative_base_churn.sql`) is final at month end, on the
-  same cadence as revenue.
+  month) is final at month end, on the same cadence as revenue.
 - **The trade-off, and what I would report.** With the case's forward-looking
   definition, a short window misses most returns (81% come after 90 days) and
   a long one delays the figure by as much. The lag comes from looking forward,
@@ -244,7 +237,7 @@ churned customers and churn rate per month, also split by new vs returning. Righ
   whatever the threshold. The two views answer different questions:
   - cohort view (`mart_churn_90d`): *"Do the customers active in month M come
     back?"* It follows a group over time;
-  - base view (`sql/additional_analysis/b2_alternative_base_churn.sql`): *"What share of our
+  - base view: *"What share of our
     customer base did we lose this month?"* A monthly outflow relative to the
     base.
 
@@ -256,8 +249,7 @@ churned customers and churn rate per month, also split by new vs returning. Righ
 
   A good direction is to keep both, as they track two different things: the
   90-day figure as an early signal on repeat behaviour, the 365-day figure as
-  the measure of customers actually lost. The base view script uses 365 days
-  by default (`churn_window_days`).
+  the measure of customers actually lost.
 
 ## Metric definitions (Part 1 – A3, B1, B2)
 
